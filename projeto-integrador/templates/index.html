@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Entradas</div>
+                <div class="card-body">
+                    <h5 class="card-title">+ R$ {{ total_income }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Saídas</div>
+                <div class="card-body">
+                    <h5 class="card-title">- R$ {{ total_expense }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total</div>
+                <div class="card-body">
+                    <h5 class="card-title">R$ {{ total_balance }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Despesas</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.description }}</td>
+                    <td>{{ expense.amount }}</td>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.category.name }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_expense', expense_id=expense.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+        <canvas id="categoryExpenseChart" style="max-width: 300px; max-height: 300px;"></canvas>
+    </div>
+    {% if alerts %}
+        <div class="alert alert-danger" role="alert">
+            <ul>
+                {% for alert in alerts %}
+                    <li>{{ alert }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('categoryExpenseChart').getContext('2d');
+            var categoryExpenseData = JSON.parse('{{ category_expense_data_json | safe }}');
+    
+            console.log(categoryExpenseData);  // Adiciona esta linha para depuração
+    
+            var labels = categoryExpenseData.map(function(data) {
+                return data.category;
+            });
+    
+            var data = categoryExpenseData.map(function(data) {
+                return data.total_expenses;
+            });
+    
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#ff6384',
+                            '#36a2eb',
+                            '#cc65fe',
+                            '#ffce56',
+                            '#ff9f40',
+                            '#4bc0c0'
+                        ],
+                        hoverBackgroundColor: [
+                            '#ff6384',
+                            '#36a2eb',
+                            '#cc65fe',
+                            '#ffce56',
+                            '#ff9f40',
+                            '#4bc0c0'
+                        ]
+                    }]
+                }
+            });
+        });
+    </script>  
+{% endblock %}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Despesa/Renda</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Adicionar Despesa/Renda{% endblock %}
+
+    {% block content %}
+    <h1>Adicionar Despesa/Renda</h1>
+    <form action="{{ url_for('add_expense') }}" method="POST">
+        <div class="form-group">
+            <label for="amount">Quantia:</label>
+            <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="date">Data:</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descrição:</label>
+            <input type="text" class="form-control" id="description" name="description">
+        </div>
+        <div class="form-group">
+            <label for="is_income">Tipo:</label>
+            <select class="form-control" id="is_income" name="is_income" onchange="toggleCategory()">
+                <option value="true">Renda</option>
+                <option value="false">Despesa</option>
+            </select>
+        </div>
+        <div class="form-group" id="category-group">
+            <label for="category">Categoria:</label>
+            <select class="form-control" id="category" name="category">
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#addCategoryModal">Adicionar Nova Categoria</button>
+        </div>
+        <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+    
+    <!-- Modal para Adicionar Categoria -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        <div class="form-group">
+                            <label for="newCategoryName">Nome da Categoria:</label>
+                            <input type="text" class="form-control" id="newCategoryName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Adicionar Categoria</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    <script>
+        function toggleCategory() {
+            var isIncome = document.getElementById('is_income').value;
+            var categoryGroup = document.getElementById('category-group');
+            var categorySelect = document.getElementById('category');
+            if (isIncome === "false") {
+                categoryGroup.style.display = 'block';
+                categorySelect.disabled = false;
+            } else {
+                categoryGroup.style.display = 'none';
+                categorySelect.disabled = true;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCategory();
+
+            document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var newCategoryName = document.getElementById('newCategoryName').value;
+                if (newCategoryName) {
+                    fetch('{{ url_for("add_category") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: newCategoryName })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            var categorySelect = document.getElementById('category');
+                            var newOption = document.createElement('option');
+                            newOption.value = data.category.id;
+                            newOption.text = data.category.name;
+                            categorySelect.add(newOption);
+                            categorySelect.value = data.category.id;
+                            $('#addCategoryModal').modal('hide');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
