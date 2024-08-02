@@ -6,7 +6,6 @@ from datetime import date, datetime, timedelta
 import json
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
-
 @app.route('/')
 def index():
     categories = Category.query.all()
@@ -28,17 +27,23 @@ def index():
             })
 
     alerts = []
+    category_budget_exceeded = {}
     for category in categories:
         total_expenses = Expense.total_expenses_by_category(category.id)
         budget = Budget.get_budget_for_category(category.id)
         if budget and total_expenses > budget:
             alerts.append(f"Atenção! Você ultrapassou o orçamento para a categoria {category.name}. Orçamento: {budget}, Gastos: {total_expenses}")
+            category_budget_exceeded[category.id] = True
+        else:
+            category_budget_exceeded[category.id] = False
 
     category_expense_data_json = json.dumps(category_expense_data)
 
     return render_template('index.html', categories=categories, expenses=expenses, budgets=budgets, 
                            total_income=total_income, total_expense=total_expense, total_balance=total_balance, 
-                           alerts=alerts, category_expense_data_json=category_expense_data_json)
+                           alerts=alerts, category_expense_data_json=category_expense_data_json, 
+                           category_budget_exceeded=category_budget_exceeded)
+
 
 
 @app.route('/delete_expense/<int:expense_id>', methods=['POST'])
@@ -48,6 +53,27 @@ def delete_expense(expense_id):
     db.session.commit()
     flash('Despesa excluída com sucesso!', 'success')
     return redirect(url_for('index'))
+
+@app.route('/add_income', methods=['GET', 'POST'])
+def add_income():
+    if request.method == 'POST':
+        amount = request.form['amount']
+        date = request.form['date']
+        description = request.form['description']
+        category_id = request.form.get('category')
+
+        if category_id == 'None':
+            category_id = None
+
+        new_income = Expense(amount=amount, date=datetime.strptime(date, '%Y-%m-%d'), description=description, is_income=True, category_id=category_id)
+        db.session.add(new_income)
+        db.session.commit()
+
+        return redirect(url_for('index'))
+
+    categories = Category.query.all()
+    return render_template('add_income.html', categories=categories)
+
 
 @app.route('/add_category', methods=['POST'])
 def add_category():
@@ -75,25 +101,23 @@ def add_expense():
         amount = request.form['amount']
         date = request.form['date']
         description = request.form['description']
-        category_id = request.form.get('category', type=int)
-        is_income = request.form['is_income'] == 'true'
+        category_id = request.form['category']
 
-        new_expense = Expense(amount=amount, date=datetime.strptime(date, '%Y-%m-%d'), description=description, category_id=category_id, is_income=is_income)
+        new_expense = Expense(amount=amount, date=datetime.strptime(date, '%Y-%m-%d'), description=description, category_id=category_id, is_income=False)
         db.session.add(new_expense)
         db.session.commit()
 
-        # Verificar se o orçamento foi ultrapassado (apenas para despesas)
-        if not is_income:
-            total_expenses = Expense.total_expenses_by_category(category_id)
-            budget = Budget.get_budget_for_category(category_id)
-            if total_expenses > budget:
-                flash(f"Atenção! Você ultrapassou o orçamento para a categoria '{Category.query.get(category_id).name}'. Orçamento: {budget}, Gastos: {total_expenses}", 'warning')
+        # Verificar se o orçamento foi ultrapassado
+        total_expenses = Expense.total_expenses_by_category(category_id)
+        budget = Budget.get_budget_for_category(category_id)
+
+        if total_expenses > budget:
+            flash(f"Atenção! Você ultrapassou o orçamento para a categoria '{Category.query.get(category_id).name}'. Orçamento: {budget}, Gastos: {total_expenses}", 'warning')
 
         return redirect(url_for('index'))
 
     categories = Category.query.all()
     return render_template('add_expense.html', categories=categories)
-
 
 @app.route('/view_expenses', methods=['GET', 'POST'])
 def view_expenses():

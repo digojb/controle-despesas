@@ -5,7 +5,7 @@ with app.app_context():
 
     # Adicionar categorias de exemplo
     if not Category.query.first():
-        categorias = ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação']
+        categorias = ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação', 'Salário']
         for nome in categorias:
             categoria = Category(name=nome)
             db.session.add(categoria)
@@ -13,4 +13,11 @@ with app.app_context():
         db.session.commit()
         print("Tabelas e categorias de exemplo criadas com sucesso!")
     else:
-        print("Categorias já existem, nenhuma nova categoria adicionada.")
+        # Verificar se a categoria "Salário" já existe
+        if not Category.query.filter_by(name='Salário').first():
+            salario_categoria = Category(name='Salário')
+            db.session.add(salario_categoria)
+            db.session.commit()
+            print("Categoria 'Salário' adicionada com sucesso!")
+        else:
+            print("Categoria 'Salário' já existe.")
