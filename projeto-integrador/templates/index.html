@@ -3,14 +3,12 @@
 {% block title %}Início{% endblock %}
 
 {% block content %}
-<!-- <div class="row"> 
-    <div class="col-md-4">
-        <a href="{{ url_for('add_expense') }}" class="btn btn-primary mb-3">Adicionar Despesa</a>
-    </div>
-    <div class="col-md-4">
-        <a href="{{ url_for('add_income') }}" class="btn btn-primary mb-3">Adicionar Renda</a>
-    </div>
-</div>-->
+
+<style>
+    .income-category {
+        color: green;
+    }
+</style>
 
 <div class="row">
     <div class="col-md-4">
@@ -57,8 +55,8 @@
                 <td>{{ expense.amount }}</td>
                 <td>{{ expense.date }}</td>
                 <td>
-                    <span class="{% if category_budget_exceeded[expense.category_id] %}text-danger{% endif %}" 
-                          title="{% if category_budget_exceeded[expense.category_id] %}Orçamento ultrapassado{% endif %}">
+                    <span class="{% if category_budget_exceeded[expense.category_id] %}text-danger{% elif expense.is_income %}income-category{% endif %}" 
+                          title="{% if category_budget_exceeded[expense.category_id] %}Orçamento ultrapassado{% elif expense.is_income %}Renda{% endif %}">
                         {{ expense.category.name }}
                     </span>
                 </td>
