@@ -27,16 +27,17 @@
             <input type="text" class="form-control" id="description" name="description">
         </div>
         <div class="form-group">
-            <label for="category">Categoria (Opcional):</label>
+            <label for="category">Categoria:</label>
             <select class="form-control" id="category" name="category">
                 <option value="None">Nenhuma</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
-            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#addCategoryModal">Adicionar Nova Categoria</button>
+            <!--<button type="button" class="btn btn-link" data-toggle="modal" data-target="#addCategoryModal">Adicionar Nova Categoria</button>-->
         </div>
         <button type="submit" class="btn btn-primary">Adicionar</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
     </form>
 
     <!-- Modal para Adicionar Categoria -->
@@ -44,7 +45,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>
+                    <!--<h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>-->
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

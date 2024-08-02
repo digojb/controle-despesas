@@ -41,9 +41,10 @@
                     <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
-            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#addCategoryModal">Adicionar Nova Categoria</button>
+            <!--<button type="button" class="btn btn-link" data-toggle="modal" data-target="#addCategoryModal">Adicionar Nova Categoria</button>-->
         </div>
         <button type="submit" class="btn btn-primary">Adicionar</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
     </form>
     
     <!-- Modal para Adicionar Categoria -->
@@ -51,7 +52,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>
+                    <!--<h5 class="modal-title" id="addCategoryModalLabel">Adicionar Nova Categoria</h5>-->
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

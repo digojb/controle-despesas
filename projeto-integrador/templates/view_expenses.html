@@ -3,8 +3,9 @@
 {% block title %}Visualizar Despesas{% endblock %}
 
 {% block content %}
-    <h1>Visualizar Despesas</h1>
-    
+    <div style="margin-bottom: 20px;">
+        <h1>Visualizar Despesas</h1>
+    </div>
     <form method="POST" action="{{ url_for('view_expenses') }}">
         <div class="form-row align-items-center">
             <div class="col-auto">
@@ -28,26 +29,27 @@
             </div>
         </div>
     </form>
-
-    <h2>Despesas - {{ start_date.strftime('%B de %Y') }}</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Data</th>
-                <th>Categoria</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for expense in expenses %}
+    <div style="margin-top: 50px;">
+        <h2>Despesas - {{ start_date.strftime('%B de %Y') }}</h2>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{ expense.description }}</td>
-                    <td>{{ expense.amount }}</td>
-                    <td>{{ expense.date }}</td>
-                    <td>{{ expense.category.name }}</td>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Data</th>
+                    <th>Categoria</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.description }}</td>
+                        <td>{{ expense.amount }}</td>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.category.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

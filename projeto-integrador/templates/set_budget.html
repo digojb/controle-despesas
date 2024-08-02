@@ -27,9 +27,11 @@
             <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
         </div>
         <button type="submit" class="btn btn-primary">Definir orçamento</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
     </form>
-
-    <h2>Orçamentos Existentes</h2>
+    <div style="margin-top: 50px;">
+        <h2>Orçamentos Existentes</h2>
+    </div>
     <form action="{{ url_for('delete_budgets') }}" method="post">
         <ul class="list-group">
             {% for budget in budgets %}
