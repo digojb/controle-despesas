@@ -6,6 +6,11 @@ from datetime import date, datetime, timedelta
 import json
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, get_flashed_messages
+from models import db, Category, Expense, Budget, app
+from datetime import datetime
+import json
+
 @app.route('/')
 def index():
     categories = Category.query.all()
@@ -13,12 +18,11 @@ def index():
     budgets = Budget.query.all()
 
     incomes = [expense for expense in expenses if expense.is_income]
-    
+
     total_income = db.session.query(db.func.sum(Expense.amount)).filter_by(is_income=True).scalar() or 0.0
     total_expense = db.session.query(db.func.sum(Expense.amount)).filter_by(is_income=False).scalar() or 0.0
     total_balance = total_income - total_expense
 
-    # Prepare data for the pie chart
     category_expense_data = []
     for category in categories:
         total_expenses = Expense.total_expenses_by_category(category.id)
@@ -41,10 +45,12 @@ def index():
 
     category_expense_data_json = json.dumps(category_expense_data)
 
-    return render_template('index.html', categories=categories, incomes=incomes, expenses=expenses, budgets=budgets, 
-                           total_income=total_income, total_expense=total_expense, total_balance=total_balance, 
-                           alerts=alerts, category_expense_data_json=category_expense_data_json, 
-                           category_budget_exceeded=category_budget_exceeded)
+    return render_template('index.html', categories=categories, incomes=incomes, expenses=expenses, budgets=budgets,
+                           total_income=total_income, total_expense=total_expense, total_balance=total_balance,
+                           alerts=alerts, category_expense_data_json=category_expense_data_json,
+                           category_budget_exceeded=category_budget_exceeded,
+                           flashed_messages=get_flashed_messages(with_categories=True))
+
 
 
 
